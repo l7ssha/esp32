@@ -97,3 +97,28 @@ sensor:
     unit_of_measurement: 'hPa'
     accuracy_decimals: 2
     id: sea_air_pressure
+
+button:
+  - platform: factory_reset
+    name: "Restart with Factory Default Settings"
+    entity_category: "config" 
+
+  - platform: restart
+    name: "Restart"
+    entity_category: "config"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+    ssid:
+      name: "Connected SSID"
+    mac_address:
+      name: "Mac Address"
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  - platform: uptime
+    name: Uptime
