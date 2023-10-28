@@ -14,7 +14,10 @@ esphome:
     - GP2Y1010AU0F.h
 
 dashboard_import:
-  package_import_url: github://l7ssha/esphome/weather-station.yaml@main
+  package_import_url:
+    url: https://github.com/l7ssha/esphome
+    ref: main 
+    file: weather-station.yaml
   import_full_config: false
 
 esp32:
