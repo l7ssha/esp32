@@ -1,0 +1,99 @@
+substitutions:
+  device_name: Weather Station
+  name: weather-station
+
+esphome:
+  name: ${name}
+  comment: ${device_name}
+  friendly_name: ${device_name}
+  name_add_mac_suffix: true
+  project:
+    name: l7ssha.weather-station
+    version: "1.0"
+
+dashboard_import:
+  package_import_url: github://l7ssha/esphome/weather-station.yaml
+  import_full_config: false
+
+esp32:
+  board: upesy_wroom
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 192.168.0.17
+    gateway: 192.168.0.1
+    subnet: 255.255.255.0
+  power_save_mode: none
+  ap:
+    ssid: "Test Fallback Hotspot"
+    password: "l7NH9oRIZEjm"
+
+captive_portal:
+
+i2c:
+  sda: 21
+  scl: 22
+
+sensor:
+  - platform: dht
+    pin: GPIO5
+    model: DHT22
+    temperature:
+      name: "Outside Temperature DHT22"
+      accuracy_decimals: 2
+      id: air_temperature
+    humidity:
+      name: "Outside Humidity"
+      accuracy_decimals: 2
+      id: relative_humidity
+    update_interval: 60s
+
+  - platform: dps310
+    temperature:
+      name: "Outside Temperature DPS310"
+      accuracy_decimals: 2
+    pressure:
+      name: "Outside Pressure"
+      accuracy_decimals: 2
+      id: air_pressure
+    address: 0x77
+    update_interval: 60s
+
+  - platform: absolute_humidity
+    name: Outside Absolute Humidity
+    temperature: air_temperature
+    humidity: relative_humidity
+
+  - platform: template
+    name: "Dew Point"
+    lambda: |-
+      return (243.5*(log(id(relative_humidity).state/100)+((17.67*id(air_temperature).state)/
+      (243.5+id(air_temperature).state)))/(17.67-log(id(relative_humidity).state/100)-
+      ((17.67*id(air_temperature).state)/(243.5+id(air_temperature).state))));
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'
+    accuracy_decimals: 2
+    update_interval: 60s
+
+  - platform: template
+    name: "Equivalent sea level pressure"
+    lambda: |-
+      const float STANDARD_ALTITUDE = 195; // in meters, see note
+      return id(air_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
+        (id(air_pressure).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
+    update_interval: 60s
+    unit_of_measurement: 'hPa'
+    accuracy_decimals: 2
+    id: sea_air_pressure
