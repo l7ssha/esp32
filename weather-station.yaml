@@ -10,6 +10,8 @@ esphome:
   project:
     name: l7ssha.weather-station
     version: "1.0"
+  includes:
+    - GP2Y1010AU0F.h
 
 dashboard_import:
   package_import_url: github://l7ssha/esphome/weather-station.yaml
@@ -97,6 +99,43 @@ sensor:
     unit_of_measurement: 'hPa'
     accuracy_decimals: 2
     id: sea_air_pressure
+
+  - platform: custom
+    lambda: |-
+      auto dust_sensor = new GP2Y1010AU0F();
+      App.register_component(dust_sensor);
+      return {dust_sensor};
+    sensors:
+      name: "PM2.5 Dust Sensor"
+      accuracy_decimals: 2
+      unit_of_measurement: "µg/m³"
+      icon: "mdi:smog"
+
+  - platform: tsl2591
+    name: "TSL2591"
+    address: 0x29
+    update_interval: 60s
+    gain: auto
+    device_factor: 53
+    glass_attenuation_factor: 14.4
+    visible:
+      name: "TSL2591 visible light"
+    infrared:
+      name: "TSL2591 infrared light"
+    full_spectrum:
+      name: "TSL2591 full spectrum light"
+    calculated_lux:
+      id: i_lux
+      name: "TSL2591 Lux"
+    actual_gain:
+      id: "actual_gain"
+      name: "TSL2591 actual gain"
+
+switch:
+  - platform: gpio
+    pin: 19
+    name: "PM2.5 Dust Sensor LED"
+    entity_category: "config"
 
 button:
   - platform: factory_reset
