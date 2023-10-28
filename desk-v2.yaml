@@ -21,7 +21,10 @@ esphome:
       - button.press: button_m
 
 dashboard_import:
-  package_import_url: github://l7ssha/esphome/desk-v2.yaml@main
+  package_import_url:
+    url: https://github.com/l7ssha/esphome
+    ref: main 
+    file: desk-v2.yaml
   import_full_config: false
 
 esp32:
