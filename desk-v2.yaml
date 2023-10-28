@@ -21,10 +21,7 @@ esphome:
       - button.press: button_m
 
 dashboard_import:
-  package_import_url:
-    url: https://github.com/l7ssha/esphome
-    ref: main 
-    file: desk-v2.yaml
+  package_import_url: github://l7ssha/esphome/desk-v2.yaml@main
   import_full_config: false
 
 esp32:
@@ -44,8 +41,10 @@ captive_portal:
 logger:
 
 api:
+  password: !secret api_password
 
 ota:
+  password: !secret ota_password
 
 uart:
   - id: desk_uart
