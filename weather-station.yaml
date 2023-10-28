@@ -131,6 +131,15 @@ sensor:
       id: "actual_gain"
       name: "TSL2591 actual gain"
 
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: uptime
+    name: Uptime
+    entity_category: "diagnostic"
+
 switch:
   - platform: gpio
     pin: 19
@@ -154,10 +163,4 @@ text_sensor:
       name: "Connected SSID"
     mac_address:
       name: "Mac Address"
-
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    update_interval: 60s
-
-  - platform: uptime
-    name: Uptime
+    entity_category: "diagnostic" 
