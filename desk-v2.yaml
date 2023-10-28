@@ -15,15 +15,13 @@ esphome:
   includes:
     - desk_height_sensor.h
     - desk_keypad.h
-  # Wake Desk by sending the "M" command
-  # This will pull the current height after boot
   on_boot:
     priority: -10
     then:
       - button.press: button_m
 
 dashboard_import:
-  package_import_url: github://l7ssha/esphome/desk-v2.yaml
+  package_import_url: github://l7ssha/esphome/desk-v2.yaml@main
   import_full_config: false
 
 esp32:
@@ -32,17 +30,10 @@ esp32:
     type: arduino
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  manual_ip:
-    static_ip: 192.168.0.18
-    gateway: 192.168.0.1
-    subnet: 255.255.255.0
   power_save_mode: none
-
   ap:
-    ssid: "office-desk"
-    password: "12345678"
+    ssid: "${name} Hotspot"
+    password: "${name}"
 
 
 captive_portal:
@@ -50,11 +41,9 @@ captive_portal:
 logger:
 
 api:
-  password: !secret api_password
 
 ota:
-  password: !secret ota_password
-    
+
 uart:
   - id: desk_uart
     baud_rate: 9600
@@ -145,7 +134,7 @@ sensor:
               
 switch:
   - platform: gpio
-    name: "Virtual Screen" # PIN20
+    name: "Virtual Screen"
     pin:
       number: GPIO23
       mode: OUTPUT
@@ -284,9 +273,9 @@ button:
 cover:
   - platform: template
     id: "desk_cover" 
-    icon: mdi:desk # or mdi:human-male-height-variant
+    icon: mdi:desk
     name: "Desk"
-    device_class: blind # makes it easier to integrate with Google/Alexa
+    device_class: blind
     has_position: true
     position_action:
       - logger.log:
@@ -333,7 +322,7 @@ number:
     step: 0.1
     lambda: !lambda |-
       return id(desk_height).state;
-    update_interval: 0ms # update in every loop() iteration
+    update_interval: 0ms
     set_action:
       - logger.log:
           format: "Requesting position change to: %x "

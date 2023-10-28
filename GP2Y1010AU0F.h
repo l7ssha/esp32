@@ -2,13 +2,17 @@
 
 static const char *TAG = "GP2Y1010AU0F.sensor";
 
-// measure VCC while the sensor is running
-#define VOLTAGE_VREF 3.4
+#define VOLTAGE_VREF 3.33
 
-#define PIN_ADC 36
+#define PIN_ADC 33
+#define PIN_LED 18
 
-// measure every 12 seconds = 5 times per minute
-#define UPDATE_INTERVAL 12000 // update interval in ms
+#define SAMPLING_TIME 280
+
+#define COV_RATIO 151
+#define NO_DUST_VOLTAGE 0.4
+
+#define UPDATE_INTERVAL 60000
 
 class GP2Y1010AU0F : public PollingComponent, public Sensor
 {
@@ -21,27 +25,25 @@ public:
     {
         ESP_LOGCONFIG(TAG, "Setting up sensor...");
 
-        pinMode(PIN_ADC, INPUT);  // output form sensor
+        pinMode(PIN_LED, OUTPUT);
+        digitalWrite(PIN_LED, LOW);
     }
 
     void update() override
     {
-        float value   = 0;
-        float voltage = 0;
-        float density = 0;
+        digitalWrite(PIN_LED, HIGH);
+        delayMicroseconds(SAMPLING_TIME);
+        float adcvalue = float(analogRead(PIN_ADC));
+        digitalWrite(PIN_LED, LOW);
 
+        float voltage = (VOLTAGE_VREF / 1024.0) * adcvalue;
+        
+        float density = 0.0;
+        if (voltage > NO_DUST_VOLTAGE) {
+            density = (voltage - NO_DUST_VOLTAGE) * COV_RATIO;
+        }
 
-        // measure voltage
-        value = analogRead(PIN_ADC);
-        delay(40);
-
-        // calculate voltage
-        voltage = value * (VOLTAGE_VREF / 1024.0);
-
-        // for calibration
-        ESP_LOGCONFIG(TAG, "Measurements done, VRef: %f, ADC Value: %f, Calculated Voltage: %f", VOLTAGE_VREF, value, voltage);
-
-        // taken from https://www.howmuchsnow.com/arduino/airquality/
-        publish_state(170 * voltage - 0.1); // publish
+        ESP_LOGCONFIG(TAG, "Measurements done, VRef: %f, ADC Value: %f, Final Voltage: %f, Density: %f", VOLTAGE_VREF, adcvalue, voltage, density);
+        publish_state(density);
     }
 };
