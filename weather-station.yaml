@@ -108,7 +108,7 @@ sensor:
       const float c9 = -0.000003;
 
       float temp = id(air_temperature).state;
-      float rh = id(relative_humidity).state;
+      float rh = id(relative_humidity).state / 100;
 
       return c1 + (c2 * temp) + (c3 * rh) + (c4 * temp * rh) + (c5 * temp * temp) + (c6 * rh * rh) + (c7 * temp * temp * rh) + (c8 * rh * rh * temp) + (c9 * rh * rh * temp * temp);
     update_interval: 60s
