@@ -10,8 +10,6 @@ esphome:
   project:
     name: l7ssha.weather-station
     version: "1.0"
-  includes:
-    - GP2Y1010AU0F.h
 
 dashboard_import:
   package_import_url: github://l7ssha/esphome/weather-station.yaml@main
@@ -96,16 +94,26 @@ sensor:
     accuracy_decimals: 2
     id: sea_air_pressure
 
-  - platform: custom
+  - platform: template
+    name: "Heat Index"
     lambda: |-
-      auto dust_sensor = new GP2Y1010AU0F();
-      App.register_component(dust_sensor);
-      return {dust_sensor};
-    sensors:
-      name: "PM2.5 Dust Sensor"
-      accuracy_decimals: 2
-      unit_of_measurement: "µg/m³"
-      icon: "mdi:smog"
+      const float c1 = -8.7846;
+      const float c2 = 1.6113;
+      const float c3 = 2.3385;
+      const float c4 = -0.1461;
+      const float c5 = -0.0123;
+      const float c6 = -0.0164;
+      const float c7 = 0.0022;
+      const float c8 = 0.0007;
+      const float c9 = -0.000003;
+
+      float temp = id(air_temperature).state;
+      float rh = id(relative_humidity).state;
+
+      return c1 + (c2 * temp) + (c3 * rh) + (c4 * temp * rh) + (c5 * temp * temp) + (c6 * rh * rh) + (c7 * temp * temp * rh) + (c8 * rh * rh * temp) + (c9 * rh * rh * temp * temp);
+    update_interval: 60s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 2
 
   - platform: tsl2591
     name: "TSL2591"
