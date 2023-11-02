@@ -1,11 +1,11 @@
 substitutions:
-  device_name: PC LED
-  name: pc-led
+  device_name: "PC LED"
+  name: "pc-led"
 
 esphome:
-  name: ${name}
-  comment: ${device_name}
-  friendly_name: ${device_name}
+  name: "${name}"
+  comment: "${device_name}"
+  friendly_name: "${device_name}"
   name_add_mac_suffix: true
   project:
     name: "l7ssha.led"
