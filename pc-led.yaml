@@ -9,10 +9,10 @@ esphome:
   name_add_mac_suffix: true
   project:
     name: "l7ssha.led"
-    version: "1.0"
+    version: "1.1"
 
 dashboard_import:
-  package_import_url: github://l7ssha/esphome/pc-led.yaml
+  package_import_url: github://l7ssha/esphome/pc-led.yaml@main
   import_full_config: false
 
 esp32:
