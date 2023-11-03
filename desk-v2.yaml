@@ -30,8 +30,6 @@ esp32:
     type: arduino
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
   power_save_mode: none
   ap:
     ssid: "${name} Hotspot"
@@ -42,10 +40,8 @@ captive_portal:
 logger:
 
 api:
-  password: !secret api_password
 
 ota:
-  password: !secret ota_password
 
 uart:
   - id: desk_uart
