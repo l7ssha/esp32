@@ -65,7 +65,7 @@ sensor:
     update_interval: 60s
 
   - platform: absolute_humidity
-    name: Outside Absolute Humidity
+    name: Absolute Humidity
     temperature: package_temperature
     humidity: package_relative_humidity
 
@@ -126,11 +126,18 @@ sensor:
     full_spectrum:
       name: "TSL2591 full spectrum light"
     calculated_lux:
-      id: i_lux
+      id: tsl2591_lux
       name: "TSL2591 Lux"
     actual_gain:
       id: "actual_gain"
       name: "TSL2591 actual gain"
+
+  - platform: ltr390
+    uv:
+      name: "LTR390 UV Index"
+    light:
+      name: "LTR390 Light"
+      id: ltr390_lux
 
   - platform: bme680
     temperature:
@@ -193,6 +200,17 @@ sensor:
         id(bme680_pressure).state
       ) / 2;
     update_interval: 60s
+  
+  - platform: template
+    name: "Package Lux"
+    unit_of_measurement: "lx"
+    icon: "mdi:weather-sunny"
+    id: package_lux
+    lambda: |-
+      return (
+        id(ltr390_lux).state +
+        id(tsl2591_lux).state
+      ) / 2;
 
   - platform: wifi_signal
     name: "WiFi Signal"
@@ -201,6 +219,11 @@ sensor:
 
   - platform: uptime
     name: Uptime
+    entity_category: "diagnostic"
+  
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    update_interval: 60s
     entity_category: "diagnostic"
 
 button:
@@ -224,6 +247,7 @@ text_sensor:
   - platform: template
     name: "BME680 IAQ Classification"
     icon: "mdi:checkbox-marked-circle-outline"
+    update_interval: 60s
     lambda: |-
       if (int(id(iaq).state) <= 50) {
         return {"Excellent"};
