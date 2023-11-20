@@ -155,6 +155,7 @@ sensor:
     icon: "mdi:gauge"
     lambda: |-
       return log(id(gas_resistance).state) + 0.04 *  id(package_relative_humidity).state;
+    update_interval: 60s
 
   - platform: template
     name: "Package Temperature"
@@ -167,6 +168,7 @@ sensor:
         id(dps310_temp).state +
         id(bme680_temp).state
       ) / 3;
+    update_interval: 60s
 
   - platform: template
     name: "Package Relative Humidity"
@@ -178,6 +180,7 @@ sensor:
         id(dht_humidity).state +
         id(bme680_humidity).state
       ) / 2;
+    update_interval: 60s
       
   - platform: template
     name: "Package Pressure"
@@ -189,6 +192,7 @@ sensor:
         id(dps310_pressure).state +
         id(bme680_pressure).state
       ) / 2;
+    update_interval: 60s
 
   - platform: wifi_signal
     name: "WiFi Signal"
@@ -245,3 +249,4 @@ text_sensor:
       else {
         return {"unknown"};
       }
+    update_interval: 60s
