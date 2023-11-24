@@ -79,6 +79,7 @@ sensor:
     icon: 'mdi:thermometer-alert'
     accuracy_decimals: 2
     update_interval: 60s
+    device_class: temperature
 
   - platform: template
     name: "Equivalent sea level pressure"
@@ -89,6 +90,7 @@ sensor:
     update_interval: 60s
     unit_of_measurement: 'hPa'
     accuracy_decimals: 2
+    device_class: pressure
     id: sea_air_pressure
 
   - platform: template
@@ -167,6 +169,7 @@ sensor:
   - platform: template
     name: "Package Temperature"
     id: package_temperature
+    device_class: temperature
     unit_of_measurement: "°C"
     icon: "mdi:thermometer-lines"
     lambda: |-
@@ -182,6 +185,7 @@ sensor:
     unit_of_measurement: "%"
     id: package_relative_humidity
     icon: "mdi:cloud-percent-outline"
+    device_class: humidity
     lambda: |-
       return (
         id(dht_humidity).state +
@@ -194,6 +198,7 @@ sensor:
     unit_of_measurement: "hPa"
     icon: "mdi:gauge-full"
     id: package_pressure
+    device_class: pressure
     lambda: |-
       return (
         id(dps310_pressure).state +
@@ -205,6 +210,7 @@ sensor:
     name: "Package Lux"
     unit_of_measurement: "lx"
     icon: "mdi:weather-sunny"
+    device_class: illuminance
     id: package_lux
     lambda: |-
       return (
@@ -273,4 +279,3 @@ text_sensor:
       else {
         return {"unknown"};
       }
-    update_interval: 60s
