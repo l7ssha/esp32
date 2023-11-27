@@ -27,6 +27,7 @@ api:
 ota:
 
 wifi:
+  use_address: 192.168.0.226
   power_save_mode: none
   ap:
     ssid: "${name} Hotspot"
@@ -35,12 +36,12 @@ wifi:
 captive_portal:
 
 i2c:
-  sda: 21
-  scl: 22
+  sda: 22
+  scl: 23
 
 sensor:
   - platform: dht
-    pin: GPIO5
+    pin: GPIO18
     model: DHT22
     temperature:
       name: "DHT22 Temperature"
@@ -80,6 +81,7 @@ sensor:
     accuracy_decimals: 2
     update_interval: 60s
     device_class: temperature
+    state_class: measurement
 
   - platform: template
     name: "Equivalent sea level pressure"
@@ -91,26 +93,20 @@ sensor:
     unit_of_measurement: 'hPa'
     accuracy_decimals: 2
     device_class: pressure
+    state_class: measurement
     id: sea_air_pressure
 
   - platform: template
     name: "Heat Index"
     lambda: |-
-      const float c1 = -8.7846;
-      const float c2 = 1.6113;
-      const float c3 = 2.3385;
-      const float c4 = -0.1461;
-      const float c5 = -0.0123;
-      const float c6 = -0.0164;
-      const float c7 = 0.0022;
-      const float c8 = 0.0007;
-      const float c9 = -0.000003;
-
       float temp = id(package_temperature).state;
-      float rh = id(package_relative_humidity).state / 100;
+      float rh = id(package_relative_humidity).state;
 
-      return c1 + (c2 * temp) + (c3 * rh) + (c4 * temp * rh) + (c5 * temp * temp) + (c6 * rh * rh) + (c7 * temp * temp * rh) + (c8 * rh * rh * temp) + (c9 * rh * rh * temp * temp);
+      auto e_value = rh * 0.06105 * exp((17.27 * temp) / (237.7 + temp));
+      return temp + 0.348 * e_value - 4.25;
     update_interval: 60s
+    state_class: measurement
+    device_class: temperature
     unit_of_measurement: "°C"
     accuracy_decimals: 2
 
@@ -165,11 +161,13 @@ sensor:
     lambda: |-
       return log(id(gas_resistance).state) + 0.04 *  id(package_relative_humidity).state;
     update_interval: 60s
+    state_class: measurement
 
   - platform: template
     name: "Package Temperature"
     id: package_temperature
     device_class: temperature
+    state_class: measurement
     unit_of_measurement: "°C"
     icon: "mdi:thermometer-lines"
     lambda: |-
@@ -186,6 +184,7 @@ sensor:
     id: package_relative_humidity
     icon: "mdi:cloud-percent-outline"
     device_class: humidity
+    state_class: measurement
     lambda: |-
       return (
         id(dht_humidity).state +
@@ -199,6 +198,7 @@ sensor:
     icon: "mdi:gauge-full"
     id: package_pressure
     device_class: pressure
+    state_class: measurement
     lambda: |-
       return (
         id(dps310_pressure).state +
@@ -217,6 +217,7 @@ sensor:
         id(ltr390_lux).state +
         id(tsl2591_lux).state
       ) / 2;
+    state_class: measurement 
 
   - platform: wifi_signal
     name: "WiFi Signal"
