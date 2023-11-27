@@ -1,0 +1,460 @@
+substitutions:
+  name: "athom-sw03-d3f1a2"
+  friendly_name: "Athom SW03"
+  project_name: "athom.sw03"
+  project_version: "1.1"
+  light1_restore_mode: RESTORE_DEFAULT_OFF
+  light2_restore_mode: RESTORE_DEFAULT_OFF
+  light3_restore_mode: RESTORE_DEFAULT_OFF
+
+esphome:
+  name: "${name}"
+  name_add_mac_suffix: false
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+
+esp8266:
+  board: esp8285
+  restore_from_flash: true
+
+preferences:
+  flash_write_interval: 1min
+
+api:
+
+ota:
+
+logger:
+  baud_rate: 0
+
+mdns:
+  disabled: false
+
+web_server:
+  port: 80
+
+wifi:
+  use_address: 192.168.0.237
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap: {} # This spawns an AP with the device name and mac address with no password.
+
+captive_portal:
+
+dashboard_import:
+  package_import_url: github://athom-tech/athom-configs/athom-sw03.yaml
+
+select:
+  - platform: template
+    name: Button 1 Action
+    id: button1_action
+    options:
+     - "none"
+     - "single"
+     - "double"
+     - "triple"
+     - "hold"
+    initial_option: "none"
+    optimistic: true
+  - platform: template
+    name: Button 2 Action
+    id: button2_action
+    options:
+     - "none"
+     - "single"
+     - "double"
+     - "triple"
+     - "hold"
+    initial_option: "none"
+    optimistic: true
+  - platform: template
+    name: Button 3 Action
+    id: button3_action
+    options:
+     - "none"
+     - "single"
+     - "double"
+     - "triple"
+     - "hold"
+    initial_option: "none"
+    optimistic: true
+
+switch:
+  - platform: template
+    id: button1_relay_on_hold
+    name: "Button 1 Relay on Hold"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: button2_relay_on_hold
+    name: "Button 2 Relay on Hold"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: button3_relay_on_hold
+    name: "Button 3 Relay on Hold"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+
+binary_sensor:
+  - platform: status
+    name: "${friendly_name} Status"
+
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO12
+      mode:
+        input: true
+        pullup: true
+    name: "${friendly_name} Button 1"
+    disabled_by_default: true
+    internal: true
+    on_multi_click:
+        # triple click
+        - timing: 
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at least 0.2s
+          then:
+            - select.set:
+                id: button1_action
+                option: 'triple'
+            - select.set:
+                id: button1_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button1_triple_clicked
+            - light.turn_on: led1
+            - delay: 0.25s
+            - light.turn_off: led1
+        # double click
+        - timing: 
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at least 0.2s
+          then:
+            - select.set:
+                id: button1_action
+                option: 'double'
+            - select.set:
+                id: button1_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button1_double_clicked
+            - light.turn_on: led1
+            - delay: 0.25s
+            - light.turn_off: led1
+        # hold button
+        - timing: 
+          - ON for 1s to 10s
+          - OFF for at least 0.25s
+          then:
+          - if:
+              condition: 
+                switch.is_on: button1_relay_on_hold
+              then:
+                - light.toggle: light1
+          - select.set:
+              id: button1_action
+              option: 'hold'
+          - select.set:
+              id: button1_action
+              option: 'none'
+          - homeassistant.event:
+              event: esphome.button1_hold
+          - light.turn_on: led1
+          - delay: 0.25s
+          - light.turn_off: led1
+        # single click
+        - timing:
+          - ON for at most 0.25s
+          - OFF for at least 0.25s
+          then:
+            - select.set:
+                id: button1_action
+                option: 'single'
+            - select.set:
+                id: button1_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button1_clicked
+            - light.turn_on: led1
+            - delay: 0.25s
+            - light.turn_off: led1
+
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO3
+      mode:
+        input: true
+        pullup: true
+    name: "${friendly_name} Button 2"
+    disabled_by_default: true
+    internal: true
+    on_multi_click:
+        # triple click
+        - timing: 
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at least 0.2s
+          then:
+            - select.set:
+                id: button2_action
+                option: 'triple'
+            - select.set:
+                id: button2_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button2_triple_clicked
+            - light.turn_on: led2
+            - delay: 0.25s
+            - light.turn_off: led2
+        # double click
+        - timing: 
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at least 0.2s
+          then:
+            - select.set:
+                id: button2_action
+                option: 'double'
+            - select.set:
+                id: button2_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button2_double_clicked
+            - light.turn_on: led2
+            - delay: 0.25s
+            - light.turn_off: led2
+        # hold button
+        - timing: 
+          - ON for 1s to 10s
+          - OFF for at least 0.25s
+          then:
+          - if:
+              condition: 
+                switch.is_on: button2_relay_on_hold
+              then:
+                - light.toggle: light2
+          - select.set:
+              id: button2_action
+              option: 'hold'
+          - select.set:
+              id: button2_action
+              option: 'none'
+          - homeassistant.event:
+              event: esphome.button2_hold
+          - light.turn_on: led2
+          - delay: 0.25s
+          - light.turn_off: led2
+        # single click
+        - timing:
+          - ON for at most 0.25s
+          - OFF for at least 0.25s
+          then:
+            - select.set:
+                id: button2_action
+                option: 'single'
+            - select.set:
+                id: button2_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button2_clicked
+            - light.turn_on: led2
+            - delay: 0.25s
+            - light.turn_off: led2
+
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO5
+      mode:
+        input: true
+        pullup: true
+    name: "${friendly_name} Button 3"
+    disabled_by_default: true
+    internal: true
+    on_multi_click:
+        # triple click
+        - timing: 
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at least 0.2s
+          then:
+            - select.set:
+                id: button3_action
+                option: 'triple'
+            - select.set:
+                id: button3_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button3_triple_clicked
+            - light.turn_on: led3
+            - delay: 0.25s
+            - light.turn_off: led3
+        # double click
+        - timing: 
+          - ON for at most 0.125s
+          - OFF for at most 0.125s
+          - ON for at most 0.125s
+          - OFF for at least 0.2s
+          then:
+            - select.set:
+                id: button3_action
+                option: 'double'
+            - select.set:
+                id: button3_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button3_double_clicked
+            - light.turn_on: led3
+            - delay: 0.25s
+            - light.turn_off: led3
+        # hold button
+        - timing: 
+          - ON for 1s to 10s
+          - OFF for at least 0.25s
+          then:
+          - if:
+              condition: 
+                switch.is_on: button3_relay_on_hold
+              then:
+                - light.toggle: light3
+          - select.set:
+              id: button3_action
+              option: 'hold'
+          - select.set:
+              id: button3_action
+              option: 'none'
+          - homeassistant.event:
+              event: esphome.button3_hold
+          - light.turn_on: led3
+          - delay: 0.25s
+          - light.turn_off: led3
+        # single click
+        - timing:
+          - ON for at most 0.25s
+          - OFF for at least 0.25s
+          then:
+            - select.set:
+                id: button3_action
+                option: 'single'
+            - select.set:
+                id: button3_action
+                option: 'none'
+            - homeassistant.event:
+                event: esphome.button3_clicked
+            - light.turn_on: led3
+            - delay: 0.25s
+            - light.turn_off: led3
+
+sensor:
+  - platform: uptime
+    name: "${friendly_name} Uptime"
+    disabled_by_default: true
+
+  - platform: wifi_signal
+    name: "${friendly_name} WiFi Signal"
+    update_interval: 60s
+
+button:
+  - platform: factory_reset
+    name: Restart with Factory Default Settings
+    id: Reset
+
+output:
+  - platform: gpio
+    pin: GPIO13
+    id: relay1
+  - platform: gpio
+    pin: GPIO4
+    id: relay2
+  - platform: gpio
+    pin: GPIO15
+    id: relay3
+
+  # Button LEDs (1.0 = Blue / 0.0 = Red)
+  - platform: esp8266_pwm
+    pin: GPIO16
+    inverted: true
+    id: button_led1
+  - platform: esp8266_pwm
+    pin: GPIO14
+    inverted: true
+    id: button_led2
+  - platform: esp8266_pwm
+    pin: GPIO1
+    inverted: true
+    id: button_led3
+
+light:
+  - platform: status_led
+    name: "${friendly_name} Status LED"
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+
+  # Relays
+  - platform: binary
+    name: "${friendly_name} Light 1"
+    id: light1
+    output: relay1
+    restore_mode: ${light1_restore_mode}
+  - platform: binary
+    name: "${friendly_name} Light 2"
+    id: light2
+    output: relay2
+    restore_mode: ${light2_restore_mode}
+  - platform: binary
+    name: "${friendly_name} Light 3"
+    id: light3
+    output: relay3
+    restore_mode: ${light3_restore_mode}
+
+  # Button LEDs
+  - platform: monochromatic
+    name: "${friendly_name} LED1"
+    disabled_by_default: true
+    id: led1
+    output: button_led1
+    default_transition_length: 500ms
+  - platform: monochromatic
+    name: "${friendly_name} LED2"
+    disabled_by_default: true
+    id: led2
+    output: button_led2
+    default_transition_length: 500ms
+  - platform: monochromatic
+    name: "${friendly_name} LED3"
+    disabled_by_default: true
+    id: led3
+    output: button_led3
+    default_transition_length: 500ms
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "${friendly_name} IP Address"
+      disabled_by_default: true
+
+time:
+  - platform: sntp
+    id: my_time
