@@ -1,12 +1,12 @@
 substitutions:
   device_name: Weather Station
-  name: weather-station
+  name: weather-station-cd9164
 
 esphome:
   name: ${name}
   comment: ${device_name}
   friendly_name: ${device_name}
-  name_add_mac_suffix: true
+  name_add_mac_suffix: false
   project:
     name: "l7ssha.weather-station"
     version: "2.0"
@@ -27,8 +27,6 @@ api:
 ota:
 
 wifi:
-  use_address: 192.168.0.226
-  power_save_mode: none
   ap:
     ssid: "${name} Hotspot"
     password: "${name}"
@@ -39,7 +37,28 @@ i2c:
   sda: 22
   scl: 23
 
+bme680_bsec:
+  address: 0x77
+
 sensor:
+  - platform: bme680_bsec
+    temperature:
+      name: "BME680 Temperature"
+      id: bme680_temp
+    pressure:
+      name: "BME680 Pressure"
+      id: bme680_pressure
+    humidity:
+      name: "BME680 Humidity"
+      id: bme680_humidity
+    iaq:
+      name: "BME680 Indoor Air Quality"
+      id: iaq
+    co2_equivalent:
+      name: "BME680 CO2 Equivalent"
+    breath_voc_equivalent:
+      name: "BME680 Breath VOC Equivalent"
+
   - platform: dht
     pin: GPIO18
     model: DHT22
@@ -53,17 +72,17 @@ sensor:
       id: dht_humidity
     update_interval: 60s
 
-  - platform: dps310
-    temperature:
-      name: "DPS310 Temperature"
-      accuracy_decimals: 2
-      id: dps310_temp
-    pressure:
-      name: "DPS310 Pressure"
-      accuracy_decimals: 2
-      id: dps310_pressure
-    address: 0x76
-    update_interval: 60s
+  # - platform: dps310
+  #   temperature:
+  #     name: "DPS310 Temperature"
+  #     accuracy_decimals: 2
+  #     id: dps310_temp
+  #   pressure:
+  #     name: "DPS310 Pressure"
+  #     accuracy_decimals: 2
+  #     id: dps310_pressure
+  #   address: 0x76
+  #   update_interval: 60s
 
   - platform: absolute_humidity
     name: Absolute Humidity
@@ -132,36 +151,12 @@ sensor:
 
   - platform: ltr390
     uv:
+      name: "LTR390 UV Counts"
+    uv_index:
       name: "LTR390 UV Index"
     light:
       name: "LTR390 Light"
       id: ltr390_lux
-
-  - platform: bme680
-    temperature:
-      name: "BME680 Temperature"
-      oversampling: 16x
-      id: bme680_temp
-    pressure:
-      name: "BME680 Pressure"
-      id: bme680_pressure
-    humidity:
-      name: "BME680 Humidity"
-      id: bme680_humidity
-    gas_resistance:
-      id: "gas_resistance"
-      name: "BME680 Gas Resistance"
-    address: 0x77
-    update_interval: 60s
-
-  - platform: template
-    name: "BME680 Indoor Air Quality"
-    id: iaq
-    icon: "mdi:gauge"
-    lambda: |-
-      return log(id(gas_resistance).state) + 0.04 *  id(package_relative_humidity).state;
-    update_interval: 60s
-    state_class: measurement
 
   - platform: template
     name: "Package Temperature"
@@ -172,10 +167,10 @@ sensor:
     icon: "mdi:thermometer-lines"
     lambda: |-
       return (
-        id(dht_temp).state +
-        id(dps310_temp).state +
+        //id(dht_temp).state +
+        //id(dps310_temp).state +
         id(bme680_temp).state
-      ) / 3;
+      ) / 1;
     update_interval: 60s
 
   - platform: template
@@ -187,9 +182,9 @@ sensor:
     state_class: measurement
     lambda: |-
       return (
-        id(dht_humidity).state +
+        //id(dht_humidity).state +
         id(bme680_humidity).state
-      ) / 2;
+      ) / 1;
     update_interval: 60s
       
   - platform: template
@@ -201,9 +196,9 @@ sensor:
     state_class: measurement
     lambda: |-
       return (
-        id(dps310_pressure).state +
+        //id(dps310_pressure).state +
         id(bme680_pressure).state
-      ) / 2;
+      ); /// 2;
     update_interval: 60s
   
   - platform: template
@@ -251,6 +246,10 @@ text_sensor:
     mac_address:
       name: "Mac Address"
   
+  - platform: bme680_bsec
+    iaq_accuracy:
+      name: "BME680 IAQ Accuracy"
+
   - platform: template
     name: "BME680 IAQ Classification"
     icon: "mdi:checkbox-marked-circle-outline"
